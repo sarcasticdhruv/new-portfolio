@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite Hacker Terminal</title>
+    <style>
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
+        body { 
+            background: #000; 
+            overflow: hidden; 
+            font-family: 'Courier New', 'Lucida Console', Monaco, monospace; 
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Matrix background effect */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+        }
+
+        .secret-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+        }
+
+        #secret {
+            background: rgba(0, 0, 0, 0.9);
+            color: #00ff00;
+            border: 2px solid #00ff00;
+            padding: 20px 40px;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            border-radius: 8px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+        }
+
+        #secret:hover {
+            background: #00ff00;
+            color: #000;
+            box-shadow: 0 0 50px #00ff00, inset 0 0 20px rgba(0, 0, 0, 0.2);
+            transform: scale(1.05);
+        }
+
+        .zoom-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 400px;
+            height: 300px;
+            background: rgba(0, 0, 0, 0.95);
+            border: 3px solid #00ff00;
+            border-radius: 15px;
+            transform: translate(-50%, -50%) scale(0.05);
+            display: none;
+            padding: 0;
+            overflow: hidden;
+            box-shadow: 0 0 100px rgba(0, 255, 0, 0.5);
+            backdrop-filter: blur(20px);
+        }
+
+        .zoom-container.active {
+            display: block;
+            animation: zoomIn 2s ease-out forwards;
+        }
+
+        @keyframes zoomIn {
+            0% {
+                transform: translate(-50%, -50%) scale(0.05);
+                opacity: 0.3;
+                border-radius: 50%;
+            }
+            50% {
+                opacity: 0.8;
+                border-radius: 25px;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                width: 100vw;
+                height: 100vh;
+                opacity: 1;
+                border-radius: 0;
+                border-width: 0;
+            }
+        }
+
+        .terminal {
+            width: 100%;
+            height: 100%;
+            color: #00ff00;
+            font-size: 14px;
+            line-height: 1.4;
+            overflow-y: auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #000000 0%, #001100 100%);
+            text-shadow: 0 0 5px #00ff00;
+        }
+
+        .terminal::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .terminal::-webkit-scrollbar-track {
+            background: #000;
+        }
+
+        .terminal::-webkit-scrollbar-thumb {
+            background: #00ff00;
+            border-radius: 4px;
+            box-shadow: 0 0 10px #00ff00;
+        }
+
+        .hidden { 
+            display: none !important; 
+        }
+
+        .status-ok {
+            color: #00ff00;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00ff00;
+        }
+
+        .status-warning {
+            color: #ffff00;
+            font-weight: bold;
+            text-shadow: 0 0 10px #ffff00;
+        }
+
+        .loading-bar {
+            width: 0%;
+            height: 4px;
+            background: linear-gradient(90deg, #00ff00, #00aa00);
+            margin: 10px 0;
+            border-radius: 2px;
+            box-shadow: 0 0 15px #00ff00;
+        }
+
+        .loading-bar.animate {
+            animation: loadBar 1s ease-in-out forwards;
+        }
+
+        @keyframes loadBar {
+            to { width: 100%; }
+        }
+
+        .glitch {
+            animation: glitch 0.2s ease-in-out;
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+
+        .system-alert {
+            color: #ff0000;
+            font-weight: bold;
+            text-shadow: 0 0 15px #ff0000;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Scanlines effect */
+        .scanlines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                transparent 50%,
+                rgba(0, 255, 0, 0.03) 50%
+            );
+            background-size: 100% 4px;
+            animation: scanlines 0.1s linear infinite;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        @keyframes scanlines {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(4px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-bg" id="matrixBg"></div>
+
+    <div class="zoom-container" id="zoomContainer">
+        <div class="scanlines"></div>
+        <div class="terminal" id="terminal"></div>
+    </div>
+
+    <script>
+        // Simplified matrix effect
+        class MatrixEffect {
+            constructor() {
+                this.container = document.getElementById('matrixBg');
+                this.chars = '01';
+                this.init();
+            }
+
+            init() {
+                // Create fewer elements for performance
+                for (let i = 0; i < 50; i++) {
+                    this.createColumn();
+                }
+            }
+
+            createColumn() {
+                const char = document.createElement('div');
+                char.textContent = this.chars[Math.floor(Math.random() * this.chars.length)];
+                char.style.cssText = `
+                    position: absolute;
+                    color: #00ff00;
+                    font-size: 12px;
+                    font-family: 'Courier New', monospace;
+                    text-shadow: 0 0 10px #00ff00;
+                    left: ${Math.random() * 100}%;
+                    animation: matrixFall ${3 + Math.random() * 3}s linear infinite;
+                    animation-delay: ${Math.random() * 2}s;
+                `;
+                this.container.appendChild(char);
+            }
+        }
+
+        // Add CSS animation for matrix fall
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes matrixFall {
+                0% { 
+                    transform: translateY(-100vh); 
+                    opacity: 1; 
+                }
+                100% { 
+                    transform: translateY(100vh); 
+                    opacity: 0; 
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize matrix effect
+        const matrixEffect = new MatrixEffect();
+
+        // Fast terminal functionality
+        class Terminal {
+            constructor(element) {
+                this.element = element;
+            }
+
+            async typeText(text, delay = 10) {
+                for (let char of text) {
+                    if (char === '\n') {
+                        this.element.innerHTML += '<br>';
+                    } else {
+                        this.element.innerHTML += char;
+                    }
+                    this.element.scrollTop = this.element.scrollHeight;
+                    await this.sleep(delay);
+                }
+            }
+
+            async typeLine(text, delay = 10, className = '') {
+                const line = document.createElement('div');
+                line.className = className;
+                line.textContent = text;
+                this.element.appendChild(line);
+                this.element.scrollTop = this.element.scrollHeight;
+                await this.sleep(delay * text.length);
+                return line;
+            }
+
+            sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            addGlitchEffect() {
+                this.element.classList.add('glitch');
+                setTimeout(() => this.element.classList.remove('glitch'), 200);
+            }
+        }
+
+        async function initializeTerminal() {
+            const terminal = new Terminal(document.getElementById('terminal'));
+            
+            // Fast initial display
+            await terminal.typeText('CLASSIFIED SYSTEM ACCESS DETECTED  █\n\n', 5);
+            
+            // Quick user profile display
+            const profileData = `> User Profile: PORTFOLIO_VISITOR
+> Clearance Level: GUEST
+> Status: AUTHENTICATED
+> Location: SECURE_NETWORK
+
+[SYSTEM READY]
+Initializing portfolio interface...
+Authentication successful.`;
+            
+            await terminal.typeText(profileData + '\n\n', 1);
+            
+            await terminal.sleep(200);
+            await showBootSequence(terminal);
+        }
+
+        async function showBootSequence(terminal) {
+            terminal.addGlitchEffect();
+            
+            // await terminal.typeText('═'.repeat(50) + '\n', 1);
+            await terminal.typeText('        PORTFOLIO SYSTEM LOADING\n', 5);
+            await terminal.typeText('═'.repeat(50) + '\n\n', 1);
+            
+            const bootMessages = [
+                { text: '> Loading interface...                    [OK]', className: 'status-ok' },
+                { text: '> Establishing connection...              [OK]', className: 'status-ok' },
+                { text: '> Authenticating user...                 [OK]', className: 'status-ok' },
+                { text: '> Loading portfolio data...              [OK]', className: 'status-ok' },
+                { text: '> Initializing graphics...               [OK]', className: 'status-ok' }
+            ];
+
+            for (let i = 0; i < bootMessages.length; i++) {
+                await terminal.sleep(150);
+                await terminal.typeLine(bootMessages[i].text, 1, bootMessages[i].className);
+            }
+
+            // Quick loading bar
+            await terminal.sleep(200);
+            const loadingContainer = document.createElement('div');
+            loadingContainer.innerHTML = '<div class="loading-bar"></div>';
+            terminal.element.appendChild(loadingContainer);
+            loadingContainer.querySelector('.loading-bar').classList.add('animate');
+
+            await terminal.sleep(1200);
+            
+            // Final messages
+            await terminal.typeLine('> WELCOME TO THE MATRIX', 10, 'status-ok');
+            await terminal.sleep(300);
+            await terminal.typeLine('> SYSTEM READY', 10, 'status-ok');
+            await terminal.sleep(200);
+            await terminal.typeLine('> REDIRECTING TO MAIN INTERFACE...', 8, 'system-alert');
+            
+            await terminal.sleep(800);
+            
+            // Final transition effect
+            terminal.addGlitchEffect();
+            await terminal.sleep(500);
+            
+            // Redirect to your portfolio
+            window.location.href = '/neoport/index.html'; // Change this to your portfolio URL
+        }
+   
+    window.addEventListener('load', function() {
+        // Show and activate the zoom container immediately
+        const zoomContainer = document.getElementById('zoomContainer');
+        zoomContainer.classList.add('active');
+        initializeTerminal();
+        // Start terminal after zoom animation completes
+        // setTimeout(async () => {
+        // }, 2000); // Wait for the 2s zoom animation
+    });
+    </script>
+</body>
+</html>

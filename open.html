@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Choice - Enter The Matrix</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            font-family: 'Courier New', monospace;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+            cursor: none;
+        }
+
+        /* Custom Cursor */
+        .cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #00ff00;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.1s ease;
+            box-shadow: 0 0 20px #00ff00, inset 0 0 20px #00ff00;
+        }
+
+        .cursor::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 4px;
+            height: 4px;
+            background: #00ff00;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px #00ff00;
+        }
+
+        /* Enhanced Matrix Rain Background */
+        .matrix-rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.6;
+        }
+
+        .matrix-column {
+            position: absolute;
+            top: -100vh;
+            font-size: 14px;
+            color: #00ff00;
+            text-shadow: 0 0 10px #00ff00;
+            font-family: 'Courier New', monospace;
+            white-space: pre;
+            animation: matrixFall linear infinite;
+            opacity: 0.8;
+        }
+
+        .matrix-column:nth-child(odd) {
+            color: #00aa00;
+            font-size: 12px;
+        }
+
+        .matrix-column:nth-child(3n) {
+            color: #ffffff;
+            opacity: 0.9;
+        }
+
+        @keyframes matrixFall {
+            0% {
+                transform: translateY(-100vh);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+
+        /* Main Container with advanced animations */
+        .container {
+            position: relative;
+            z-index: 10;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(ellipse at center, rgba(0, 50, 0, 0.4) 0%, rgba(0, 0, 0, 0.9) 70%);
+        }
+
+        /* Enhanced Welcome Section */
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 4rem;
+            opacity: 0;
+            animation: fadeInUp 2s ease-out 0.5s forwards;
+        }
+
+        .title {
+            font-size: 4.5rem;
+            color: #ffffff;
+            text-shadow: 
+                0 0 20px #00ff00, 
+                0 0 40px #00ff00,
+                0 0 60px #00ff00;
+            margin-bottom: 1rem;
+            font-weight: bold;
+            letter-spacing: 4px;
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            0% {
+                text-shadow: 
+                    0 0 20px #00ff00, 
+                    0 0 40px #00ff00,
+                    0 0 60px #00ff00;
+            }
+            100% {
+                text-shadow: 
+                    0 0 30px #00ff00, 
+                    0 0 60px #00ff00,
+                    0 0 90px #00ff00,
+                    0 0 120px #00ff00;
+            }
+        }
+
+        .subtitle {
+            font-size: 1.4rem;
+            color: #00ff00;
+            text-shadow: 0 0 15px #00ff00;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            letter-spacing: 2px;
+        }
+
+        .description {
+            font-size: 1.1rem;
+            color: #ffffff;
+            max-width: 700px;
+            line-height: 1.8;
+            opacity: 0.8;
+            margin: 0 auto;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Enhanced Choice Section */
+        .choice-section {
+            opacity: 0;
+            animation: fadeInUp 2s ease-out 1.5s forwards;
+        }
+
+        .choice-text {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .morpheus-quote {
+            font-size: 1.5rem;
+            color: #ffffff;
+            font-style: italic;
+            text-shadow: 0 0 15px #ffffff;
+            margin-bottom: 1.5rem;
+            opacity: 0.95;
+            letter-spacing: 1px;
+            animation: quotePulse 4s ease-in-out infinite;
+        }
+
+        @keyframes quotePulse {
+            0%, 100% { opacity: 0.95; }
+            50% { opacity: 1; }
+        }
+
+        .choice-subtitle {
+            font-size: 1.1rem;
+            color: #00ff00;
+            text-shadow: 0 0 10px #00ff00;
+            opacity: 0.85;
+            letter-spacing: 1px;
+        }
+
+        /* Revolutionary Pills Container */
+        .pills-container {
+            display: flex;
+            gap: 6rem;
+            align-items: center;
+            justify-content: center;
+            perspective: 1000px;
+        }
+
+        .pill {
+            position: relative;
+            width: 140px;
+            height: 70px;
+            border-radius: 35px;
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: 3px solid transparent;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            transform-style: preserve-3d;
+        }
+
+        .pill::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 37px;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: -1;
+        }
+
+        .pill:hover::before {
+            opacity: 1;
+            animation: rotate 2s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .pill::after {
+            content: '';
+            position: absolute;
+            top: 10%;
+            left: 20%;
+            width: 60%;
+            height: 30%;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            filter: blur(8px);
+            opacity: 0.6;
+        }
+
+        /* Enhanced Red Pill */
+        .red-pill {
+            background: linear-gradient(135deg, #ff0000, #cc0000, #990000, #ff0000);
+            background-size: 200% 200%;
+            color: #ffffff;
+            text-shadow: 0 0 15px #ffffff;
+            box-shadow: 
+                0 0 30px rgba(255, 0, 0, 0.6),
+                0 15px 40px rgba(0, 0, 0, 0.6),
+                inset 0 2px 0 rgba(255, 255, 255, 0.3),
+                inset 0 -2px 0 rgba(0, 0, 0, 0.3);
+            animation: redPillGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes redPillGlow {
+            0% {
+                box-shadow: 
+                    0 0 30px rgba(255, 0, 0, 0.6),
+                    0 15px 40px rgba(0, 0, 0, 0.6),
+                    inset 0 2px 0 rgba(255, 255, 255, 0.3);
+                background-position: 0% 50%;
+            }
+            100% {
+                box-shadow: 
+                    0 0 50px rgba(255, 0, 0, 0.9),
+                    0 15px 40px rgba(0, 0, 0, 0.6),
+                    inset 0 2px 0 rgba(255, 255, 255, 0.4);
+                background-position: 100% 50%;
+            }
+        }
+
+        .red-pill:hover {
+            transform: translateY(-8px) scale(1.1) rotateX(10deg);
+            box-shadow: 
+                0 0 60px rgba(255, 0, 0, 1),
+                0 20px 50px rgba(0, 0, 0, 0.8),
+                inset 0 2px 0 rgba(255, 255, 255, 0.5);
+        }
+
+        .red-pill:active {
+            transform: translateY(-5px) scale(1.05) rotateX(5deg);
+            animation: redPillPulse 0.3s ease-in-out;
+        }
+
+        @keyframes redPillPulse {
+            0%, 100% { transform: translateY(-5px) scale(1.05) rotateX(5deg); }
+            50% { transform: translateY(-5px) scale(1.15) rotateX(5deg); }
+        }
+
+        /* Enhanced Blue Pill */
+        .blue-pill {
+            background: linear-gradient(135deg, #0066ff, #0052cc, #003d99, #0066ff);
+            background-size: 200% 200%;
+            color: #ffffff;
+            text-shadow: 0 0 15px #ffffff;
+            box-shadow: 
+                0 0 30px rgba(0, 102, 255, 0.6),
+                0 15px 40px rgba(0, 0, 0, 0.6),
+                inset 0 2px 0 rgba(255, 255, 255, 0.3),
+                inset 0 -2px 0 rgba(0, 0, 0, 0.3);
+            animation: bluePillGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes bluePillGlow {
+            0% {
+                box-shadow: 
+                    0 0 30px rgba(0, 102, 255, 0.6),
+                    0 15px 40px rgba(0, 0, 0, 0.6),
+                    inset 0 2px 0 rgba(255, 255, 255, 0.3);
+                background-position: 0% 50%;
+            }
+            100% {
+                box-shadow: 
+                    0 0 50px rgba(0, 102, 255, 0.9),
+                    0 15px 40px rgba(0, 0, 0, 0.6),
+                    inset 0 2px 0 rgba(255, 255, 255, 0.4);
+                background-position: 100% 50%;
+            }
+        }
+
+        .blue-pill:hover {
+            transform: translateY(-8px) scale(1.1) rotateX(10deg);
+            box-shadow: 
+                0 0 60px rgba(0, 102, 255, 1),
+                0 20px 50px rgba(0, 0, 0, 0.8),
+                inset 0 2px 0 rgba(255, 255, 255, 0.5);
+        }
+
+        .blue-pill:active {
+            transform: translateY(-5px) scale(1.05) rotateX(5deg);
+            animation: bluePillPulse 0.3s ease-in-out;
+        }
+
+        @keyframes bluePillPulse {
+            0%, 100% { transform: translateY(-5px) scale(1.05) rotateX(5deg); }
+            50% { transform: translateY(-5px) scale(1.15) rotateX(5deg); }
+        }
+
+        /* Enhanced Pill Labels */
+        .pill-label {
+            position: absolute;
+            bottom: -3.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1rem;
+            color: #ffffff;
+            opacity: 0.7;
+            transition: all 0.4s ease;
+            text-align: center;
+            white-space: nowrap;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .pill:hover .pill-label {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-5px);
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+        }
+
+        /* Enhanced Floating Particles */
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #00ff00;
+            border-radius: 50%;
+            box-shadow: 0 0 15px #00ff00;
+            animation: float linear infinite;
+        }
+
+        .particle:nth-child(even) {
+            background: #ffffff;
+            box-shadow: 0 0 15px #ffffff;
+            width: 2px;
+            height: 2px;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) translateX(0) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+                transform: translateY(90vh) translateX(10px) scale(1);
+            }
+            90% {
+                opacity: 1;
+                transform: translateY(-90vh) translateX(50px) scale(1);
+            }
+            100% {
+                transform: translateY(-100vh) translateX(60px) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* Enhanced Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(80px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Transition Effects */
+        .fade-out {
+            animation: matrixTransition 2s ease-in forwards;
+        }
+
+        @keyframes matrixTransition {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(1.1);
+                filter: blur(2px);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.8);
+                filter: blur(5px);
+            }
+        }
+
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .loading-text {
+            color: #00ff00;
+            font-size: 1.5rem;
+            text-shadow: 0 0 20px #00ff00;
+            margin-bottom: 2rem;
+            animation: loadingPulse 1s ease-in-out infinite;
+        }
+
+        @keyframes loadingPulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .loading-bar-container {
+            width: 300px;
+            height: 4px;
+            background: rgba(0, 255, 0, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .loading-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #00ff00, #00aa00, #00ff00);
+            border-radius: 2px;
+            box-shadow: 0 0 20px #00ff00;
+            transition: width 2s ease-out;
+        }
+
+        /* Add this AFTER the existing .loading-bar styles (around line 587) */
+
+        /* White theme for blue pill loading */
+        .loading-overlay.white-theme {
+            background: #ffffff;
+        }
+
+        .loading-overlay.white-theme .loading-text {
+            color: #0066ff;
+            text-shadow: 0 0 20px #0066ff;
+        }
+
+        .loading-overlay.white-theme .loading-bar-container {
+            background: rgba(0, 102, 255, 0.2);
+            border: 1px solid rgba(0, 102, 255, 0.3);
+        }
+
+        .loading-overlay.white-theme .loading-bar {
+            background: linear-gradient(90deg, #0066ff, #0052cc, #0066ff);
+            box-shadow: 0 0 20px #0066ff;
+        }
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .title {
+                font-size: 3rem;
+            }
+            
+            .pills-container {
+                gap: 3rem;
+                flex-direction: column;
+            }
+            
+            .pill {
+                width: 120px;
+                height: 60px;
+                font-size: 1rem;
+            }
+            
+            .morpheus-quote {
+                font-size: 1.2rem;
+            }
+
+            .description {
+                font-size: 1rem;
+                max-width: 90%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .title {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .pill {
+                width: 100px;
+                height: 50px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Custom Cursor -->
+    <div class="cursor" id="cursor"></div>
+
+    <!-- Matrix Rain Background -->
+    <div class="matrix-rain" id="matrixRain"></div>
+    
+    <!-- Floating Particles -->
+    <div id="particles"></div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-text">ENTERING THE MATRIX...</div>
+        <div class="loading-bar-container">
+            <div class="loading-bar" id="loadingBar"></div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container" id="mainContainer">
+        <div class="welcome-section">
+            <h1 class="title">WELCOME</h1>
+            <p class="subtitle">TO THE DIGITAL NEXUS</p>
+            <p class="description">
+                You stand at the threshold between realities. Your journey through my digital realm 
+                can unfold in two distinct ways. Each path reveals a different layer of truth, 
+                a different perspective on the code that shapes our world.
+            </p>
+        </div>
+
+        <div class="choice-section">
+            <div class="choice-text">
+                <p class="morpheus-quote">
+                    "This is your last chance. After this, there is no going back."
+                </p>
+                <p class="choice-subtitle">
+                    Choose your interface to explore my portfolio
+                </p>
+            </div>
+
+            <div class="pills-container">
+                <div class="pill red-pill" id="redPill">
+                    <span>Red Pill</span>
+                    <div class="pill-label">The Deep Truth<br><small>Elite Hacker Terminal</small></div>
+                </div>
+
+                <div class="pill blue-pill" id="bluePill">
+                    <span>Blue Pill</span>
+                    <div class="pill-label">The Beautiful Lie<br><small>Traditional Portfolio</small></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Custom Cursor
+        class CustomCursor {
+            constructor() {
+                this.cursor = document.getElementById('cursor');
+                this.init();
+            }
+
+            init() {
+                document.addEventListener('mousemove', (e) => {
+                    this.cursor.style.left = e.clientX - 10 + 'px';
+                    this.cursor.style.top = e.clientY - 10 + 'px';
+                });
+
+                document.addEventListener('mousedown', () => {
+                    this.cursor.style.transform = 'scale(0.8)';
+                });
+
+                document.addEventListener('mouseup', () => {
+                    this.cursor.style.transform = 'scale(1)';
+                });
+            }
+        }
+
+        // Enhanced Matrix Rain Effect
+        class MatrixRain {
+            constructor() {
+                this.container = document.getElementById('matrixRain');
+                this.chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ⚡☰☱☲☳☴☵☶☷';
+                this.columns = Math.floor(window.innerWidth / 20);
+                this.init();
+            }
+
+            init() {
+                this.container.innerHTML = '';
+                for (let i = 0; i < this.columns; i++) {
+                    this.createColumn(i);
+                }
+            }
+
+            createColumn(index) {
+                const column = document.createElement('div');
+                column.className = 'matrix-column';
+                column.style.left = `${index * 20}px`;
+                column.style.animationDuration = `${Math.random() * 4 + 3}s`;
+                column.style.animationDelay = `${Math.random() * 3}s`;
+                
+                let text = '';
+                const length = Math.floor(Math.random() * 25) + 15;
+                for (let j = 0; j < length; j++) {
+                    text += this.chars[Math.floor(Math.random() * this.chars.length)] + '\n';
+                }
+                column.textContent = text;
+                
+                this.container.appendChild(column);
+
+                // Recreate column after animation
+                setTimeout(() => {
+                    if (column.parentNode) {
+                        this.createColumn(index);
+                        column.remove();
+                    }
+                }, (Math.random() * 4 + 3) * 1000);
+            }
+        }
+
+        // Enhanced Floating Particles Effect
+        class ParticleSystem {
+            constructor() {
+                this.container = document.getElementById('particles');
+                this.init();
+            }
+
+            init() {
+                for (let i = 0; i < 30; i++) {
+                    setTimeout(() => this.createParticle(), i * 300);
+                }
+            }
+
+            createParticle() {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.animationDuration = `${Math.random() * 12 + 8}s`;
+                particle.style.animationDelay = `${Math.random() * 3}s`;
+                
+                this.container.appendChild(particle);
+                
+                setTimeout(() => {
+                    if (particle.parentNode) {
+                        particle.parentNode.removeChild(particle);
+                    }
+                    setTimeout(() => this.createParticle(), Math.random() * 2000);
+                }, 20000);
+            }
+        }
+
+        // Audio Context for Sound Effects
+        class SoundEffects {
+            constructor() {
+                this.audioContext = null;
+                this.init();
+            }
+
+            init() {
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) {
+                    console.log('Web Audio API not supported');
+                }
+            }
+
+            playBeep(frequency = 800, duration = 200) {
+                if (!this.audioContext) return;
+
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+
+                oscillator.frequency.value = frequency;
+                oscillator.type = 'sine';
+
+                gainNode.gain.setValueAtTime(0.3, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + duration / 1000);
+
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + duration / 1000);
+            }
+        }
+
+        // Initialize all systems
+        const customCursor = new CustomCursor();
+        const matrixRain = new MatrixRain();
+        const particleSystem = new ParticleSystem();
+        const soundEffects = new SoundEffects();
+
+        // Pill Selection Logic with Enhanced Effects
+        const redPill = document.getElementById('redPill');
+        const bluePill = document.getElementById('bluePill');
+        const mainContainer = document.getElementById('mainContainer');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const loadingBar = document.getElementById('loadingBar');
+
+        // Add hover sound effects
+        [redPill, bluePill].forEach(pill => {
+            pill.addEventListener('mouseenter', () => {
+                soundEffects.playBeep(600, 100);
+            });
+        });
+
+        redPill.addEventListener('click', function() {
+            soundEffects.playBeep(1200, 300);
+            
+            // Enhanced transition effect
+            mainContainer.classList.add('fade-out');
+            
+            setTimeout(() => {
+                mainContainer.style.display = 'none';
+                loadingOverlay.style.display = 'flex';
+                
+                setTimeout(() => {
+                    loadingBar.style.width = '100%';
+                }, 100);
+                
+                setTimeout(() => {
+                    // Redirect to hacker terminal
+                    window.location.href = '1.html';
+                }, 2500);
+            }, 2000);
+        });
+
+        /* filepath: g:\Pursuits\New Portfolio\open.html */
+/* Replace the existing bluePill.addEventListener block with: */
+
+        bluePill.addEventListener('click', function() {
+            soundEffects.playBeep(400, 300);
+            
+            // Enhanced transition effect
+            mainContainer.classList.add('fade-out');
+            
+            setTimeout(() => {
+                mainContainer.style.display = 'none';
+                loadingOverlay.style.display = 'flex';
+                loadingOverlay.classList.add('white-theme'); // Add this line
+                
+                setTimeout(() => {
+                    loadingBar.style.width = '100%';
+                }, 100);
+                
+                setTimeout(() => {
+                    // Redirect to traditional portfolio
+                    window.location.href = 'simpli/index.html';
+                }, 2500);
+            }, 2000);
+        });
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            matrixRain.init();
+        });
+
+        // Konami Code Easter Egg
+        let konamiCode = [];
+        const konamiSequence = [
+            'ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
+            'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight',
+            'KeyB', 'KeyA'
+        ];
+
+        document.addEventListener('keydown', (e) => {
+            konamiCode.push(e.code);
+            if (konamiCode.length > konamiSequence.length) {
+                konamiCode.shift();
+            }
+            
+            if (konamiCode.join(',') === konamiSequence.join(',')) {
+                // Easter egg activation
+                document.body.style.filter = 'hue-rotate(180deg)';
+                soundEffects.playBeep(800, 100);
+                setTimeout(() => soundEffects.playBeep(1000, 100), 100);
+                setTimeout(() => soundEffects.playBeep(1200, 200), 200);
+                
+                setTimeout(() => {
+                    document.body.style.filter = '';
+                }, 3000);
+                
+                konamiCode = [];
+            }
+        });
+
+        // Preload next pages
+        window.addEventListener('load', () => {
+            const link1 = document.createElement('link');
+            link1.rel = 'prefetch';
+            link1.href = '1.html';
+            document.head.appendChild(link1);
+            
+            const link2 = document.createElement('link');
+            link2.rel = 'prefetch';
+            link2.href = '/simpli/index.html';
+            document.head.appendChild(link2);
+        });
+    </script>
+</body>
+</html>
